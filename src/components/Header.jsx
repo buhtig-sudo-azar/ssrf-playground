@@ -10,6 +10,10 @@ export default function Header() {
           <IoShieldOutline className="header__icon" />
           <h1 className="header__title">SSRF Playground</h1>
         </div>
+        <div className="header__nav">
+          <a href="#theory" className="header__nav-link">Теория</a>
+          <a href="#sandbox" className="header__nav-link">Песочница</a>
+        </div>
         <ThemeToggle />
       </div>
     </header>

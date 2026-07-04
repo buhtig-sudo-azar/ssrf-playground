@@ -35,7 +35,33 @@
   letter-spacing: -0.5px;
 }
 
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header__nav-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.header__nav-link:hover {
+  color: var(--primary-color);
+  background: var(--sandbox-bg);
+  text-decoration: none;
+}
+
 @media (max-width: 600px) {
+  .header__nav {
+    display: none;
+  }
+
   .header__container {
     padding: 10px 12px;
   }

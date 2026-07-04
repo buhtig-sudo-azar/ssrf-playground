@@ -11,6 +11,7 @@ function App() {
       <Header />
       <main className="app__main">
         <TheorySection />
+        <hr className="app__divider" />
         <Sandbox />
       </main>
       <Footer />

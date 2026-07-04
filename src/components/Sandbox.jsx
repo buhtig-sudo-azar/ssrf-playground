@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { IoSend, IoRefresh, IoChevronDown, IoChevronUp, IoAlertCircle, IoCheckmarkCircle, IoWarning, IoBook, IoFlame } from 'react-icons/io5';
+import { IoSend, IoRefresh, IoChevronDown, IoChevronUp, IoAlertCircle, IoCheckmarkCircle, IoWarning, IoBook, IoFlame, IoChevronForward } from 'react-icons/io5';
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import json from 'react-syntax-highlighter/dist/esm/languages/hljs/json';
 import { atomOneDark, atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
@@ -15,6 +15,145 @@ const SEVERITY_MAP = {
   medium: { label: 'Средний', color: 'var(--info-color)', icon: <IoCheckmarkCircle /> },
   low: { label: 'Низкий', color: 'var(--success-color)', icon: <IoCheckmarkCircle /> },
 };
+
+function AttackChainView({ data }) {
+  if (!data.attack_chain) return null;
+  return (
+    <div className="sandbox__chain">
+      <div className="sandbox__chain-header">Цепочка атаки (Attack Chain)</div>
+      {data.attack_chain.map((step, idx) => (
+        <div key={idx} className="sandbox__chain-step">
+          <div className="sandbox__chain-step-header">
+            <span className="sandbox__chain-step-num">{step.step}</span>
+            <span className="sandbox__chain-step-action">{step.action}</span>
+            <span className="sandbox__chain-step-result">{step.result}</span>
+          </div>
+          <div className="sandbox__chain-step-details">
+            <div className="sandbox__chain-detail">
+              <span className="sandbox__chain-detail-label">Команда:</span>
+              <code>{step.command}</code>
+            </div>
+            <div className="sandbox__chain-detail">
+              <span className="sandbox__chain-detail-label">Назначение:</span>
+              <span>{step.purpose}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+      {data.final_result && (
+        <div className="sandbox__chain-result">
+          <IoAlertCircle />
+          <span>{data.final_result}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TimelineView({ data }) {
+  if (!data.timeline) return null;
+  return (
+    <div className="sandbox__timeline">
+      <div className="sandbox__timeline-header">Timeline DNS Rebinding</div>
+      {data.timeline.map((entry, idx) => (
+        <div key={idx} className={`sandbox__timeline-entry sandbox__timeline-entry--${entry.color}`}>
+          <span className="sandbox__timeline-phase">{entry.phase}</span>
+          <span className="sandbox__timeline-time">{entry.time}</span>
+          <span className="sandbox__timeline-action">{entry.action}</span>
+          <span className="sandbox__timeline-ip">{entry.resolved_ip || entry.data}</span>
+          <span className="sandbox__timeline-note">{entry.note || entry.result}</span>
+        </div>
+      ))}
+      {data.gap_explanation && (
+        <div className="sandbox__timeline-gap">{data.gap_explanation}</div>
+      )}
+    </div>
+  );
+}
+
+function OOBView({ data }) {
+  if (!data.oob_channel) return null;
+  return (
+    <div className="sandbox__oob">
+      <div className="sandbox__oob-header">Out-of-Band Detection (OOB)</div>
+      <div className="sandbox__oob-status">
+        <IoAlertCircle />
+        <span>{data.oob_channel.status}</span>
+      </div>
+      <div className="sandbox__oob-section">
+        <h4>DNS-запросы от уязвимого сервера:</h4>
+        {data.dns_log?.map((log, idx) => (
+          <div key={idx} className="sandbox__oob-log-entry">
+            <code>{log.query}</code>
+            <span className="sandbox__oob-meta">type: {log.type} | from: {log.source_ip}</span>
+            <span className="sandbox__oob-note">{log.note}</span>
+          </div>
+        ))}
+      </div>
+      <div className="sandbox__oob-section">
+        <h4>HTTP-запросы от уязвимого сервера:</h4>
+        {data.http_log?.map((log, idx) => (
+          <div key={idx} className="sandbox__oob-log-entry">
+            <code>{log.method} {log.url}</code>
+            <span className="sandbox__oob-meta">from: {log.source_ip} | UA: {log.user_agent}</span>
+            <span className="sandbox__oob-note">{log.note}</span>
+          </div>
+        ))}
+      </div>
+      {data.leaked_headers && (
+        <div className="sandbox__oob-section">
+          <h4>Утечка через HTTP-заголовки:</h4>
+          <div className="sandbox__oob-headers">
+            {Object.entries(data.leaked_headers).map(([k, v]) => (
+              <div key={k} className="sandbox__oob-header-entry">
+                <span className="sandbox__oob-header-key">{k}:</span>
+                <code>{v}</code>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {data.impact && (
+        <div className="sandbox__oob-impact">
+          <strong>Impact:</strong> {data.impact}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BypassView({ data }) {
+  if (!data.bypass_variants) return null;
+  return (
+    <div className="sandbox__bypass-result">
+      <div className="sandbox__bypass-result-header">
+        <span className="sandbox__bypass-technique-name">{data.technique}</span>
+      </div>
+      <div className="sandbox__bypass-diff">
+        <div className="sandbox__bypass-saw">
+          <strong>Фильтр увидел:</strong>
+          <code>{data.filter_saw}</code>
+        </div>
+        <IoChevronForward className="sandbox__bypass-arrow" />
+        <div className="sandbox__bypass-actual">
+          <strong>Реальный запрос:</strong>
+          <code>{data.client_resolved || data.client_requested}</code>
+        </div>
+      </div>
+      <div className="sandbox__bypass-result-text">
+        <strong>Результат:</strong> {data.result}
+      </div>
+      <div className="sandbox__bypass-variants">
+        <strong>Другие варианты этой техники:</strong>
+        <ul>
+          {data.bypass_variants.map((v, idx) => (
+            <li key={idx}><code>{v}</code></li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
 
 export default function Sandbox() {
   const { theme } = useTheme();
@@ -112,20 +251,29 @@ export default function Sandbox() {
 
   const highlightStyle = theme === 'dark' ? atomOneDark : atomOneLight;
 
+  // Check if response data has special visualization
+  const responseData = response?.data;
+  const hasChain = responseData?.attack_chain;
+  const hasTimeline = responseData?.timeline;
+  const hasOOB = responseData?.oob_channel;
+  const hasBypass = responseData?.bypass_variants;
+  const hasSpecialView = hasChain || hasTimeline || hasOOB || hasBypass;
+
   return (
     <section className="sandbox" id="sandbox">
       <h2 className="sandbox__heading">Интерактивная песочница</h2>
       <p className="sandbox__intro">
-        Здесь вы можете <strong>самостоятельно попробовать</strong> каждый вектор SSRF-атаки
-        в безопасной эмулированной среде. Выберите сценарий, прочитайте пояснение перед отправкой,
-        нажмите «Отправить запрос» и изучите результат. Под каждым ответом есть детальный разбор:
-        что произошло, почему это опасно, и реальный пример из жизни.
+        Здесь вы можете <strong>самостоятельно попробовать</strong> 8 векторов SSRF-атаки
+        в безопасной эмулированной среде. Выберите сценарий из списка (от базовых до продвинутых:
+        Blind SSRF, обход фильтров, gopher:// RCE), прочитайте пояснение перед отправкой,
+        нажмите «Отправить запрос» и изучите результат. Каждый ответ снабжён детальным разбором,
+        пошаговой инструкцией атаки и реальным примером из жизни.
       </p>
 
       {/* Scenario Selector */}
       <div className="sandbox__selector">
         <label htmlFor="scenario-select" className="sandbox__label">
-          Сценарий атаки:
+          Сценарий атаки ({scenarios.length}):
         </label>
         <select
           id="scenario-select"
@@ -145,7 +293,7 @@ export default function Sandbox() {
       <div className="sandbox__pre-explanation">
         <div className="sandbox__pre-explanation-header">
           <IoBook className="sandbox__pre-icon" />
-          <span>Перед тем как нажать «Отправить» — прочитайте, что произойдёт:</span>
+          <span>Перед тем как нажать «Отправить» — что произойдёт:</span>
         </div>
         <p className="sandbox__pre-text">{selectedScenario?.preExplanation}</p>
       </div>
@@ -235,35 +383,45 @@ export default function Sandbox() {
             </div>
           )}
 
-          <div className="sandbox__response-body">
-            {typeof response.data === 'string' ? (
-              <SyntaxHighlighter
-                language="text"
-                style={highlightStyle}
-                customStyle={{
-                  borderRadius: 8,
-                  padding: 16,
-                  fontSize: '0.85rem',
-                  margin: 0,
-                }}
-              >
-                {response.data}
-              </SyntaxHighlighter>
-            ) : (
-              <SyntaxHighlighter
-                language="json"
-                style={highlightStyle}
-                customStyle={{
-                  borderRadius: 8,
-                  padding: 16,
-                  fontSize: '0.85rem',
-                  margin: 0,
-                }}
-              >
-                {formatResponse(response.data)}
-              </SyntaxHighlighter>
-            )}
-          </div>
+          {/* Special Views (attack chain, timeline, OOB, bypass) */}
+          {hasSpecialView ? (
+            <div className="sandbox__response-special">
+              <AttackChainView data={responseData} />
+              <TimelineView data={responseData} />
+              <OOBView data={responseData} />
+              <BypassView data={responseData} />
+            </div>
+          ) : (
+            <div className="sandbox__response-body">
+              {typeof response.data === 'string' ? (
+                <SyntaxHighlighter
+                  language="text"
+                  style={highlightStyle}
+                  customStyle={{
+                    borderRadius: 8,
+                    padding: 16,
+                    fontSize: '0.85rem',
+                    margin: 0,
+                  }}
+                >
+                  {response.data}
+                </SyntaxHighlighter>
+              ) : (
+                <SyntaxHighlighter
+                  language="json"
+                  style={highlightStyle}
+                  customStyle={{
+                    borderRadius: 8,
+                    padding: 16,
+                    fontSize: '0.85rem',
+                    margin: 0,
+                  }}
+                >
+                  {formatResponse(response.data)}
+                </SyntaxHighlighter>
+              )}
+            </div>
+          )}
 
           {/* Response Annotation */}
           {response.responseAnnotation && (
@@ -333,7 +491,7 @@ export default function Sandbox() {
                 <p>
                   Указанный URL не соответствует ни одному из известных векторов атаки.
                   В реальном сценарии сервер вернул бы ошибку или содержимое запрошенного ресурса.
-                  Попробуйте выбрать один из сценариев в выпадающем списке выше, чтобы увидеть
+                  Попробуйте выбрать один из 8 сценариев в выпадающем списке выше, чтобы увидеть
                   детальный разбор атаки с пояснениями.
                 </p>
               )}
