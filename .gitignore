@@ -24,4 +24,5 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+*.sw?check1.json
+check2.json
