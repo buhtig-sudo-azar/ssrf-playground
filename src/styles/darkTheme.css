@@ -1,0 +1,36 @@
+[data-theme="dark"] {
+  --bg-color: #0d1117;
+  --bg-secondary: #161b22;
+  --text-color: #e6edf3;
+  --text-secondary: #8b949e;
+  --primary-color: #58a6ff;
+  --primary-hover: #79c0ff;
+  --accent-color: #f85149;
+  --accent-hover: #ff7b72;
+  --sandbox-bg: #161b22;
+  --sandbox-border: #30363d;
+  --card-bg: #161b22;
+  --card-border: #30363d;
+  --card-shadow: rgba(0, 0, 0, 0.3);
+  --input-bg: #0d1117;
+  --input-border: #30363d;
+  --input-focus: #58a6ff;
+  --code-bg: #1c2128;
+  --code-text: #ff7b72;
+  --tooltip-bg: #2d2a1e;
+  --tooltip-border: #9e8c3c;
+  --tooltip-text: #e3b341;
+  --header-bg: #161b22;
+  --header-border: #30363d;
+  --footer-bg: #161b22;
+  --footer-text: #8b949e;
+  --success-color: #3fb950;
+  --warning-color: #d29922;
+  --danger-color: #f85149;
+  --info-color: #58a6ff;
+  --divider-color: #30363d;
+  --scrollbar-track: #161b22;
+  --scrollbar-thumb: #30363d;
+  --animation-path: #58a6ff;
+  --path-arrow: #3fb950;
+}

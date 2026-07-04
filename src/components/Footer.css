@@ -1,0 +1,13 @@
+.footer {
+  text-align: center;
+  padding: 20px;
+  background: var(--footer-bg);
+  margin-top: 40px;
+  border-top: 1px solid var(--divider-color);
+}
+
+.footer__text {
+  color: var(--footer-text);
+  margin: 0;
+  font-size: 0.9rem;
+}
