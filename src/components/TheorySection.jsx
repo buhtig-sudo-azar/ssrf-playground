@@ -345,15 +345,15 @@ export default function TheorySection() {
           </div>
         </a>
         <a
-          href="https://hack-trick.blogspot.com/2022/04/all-about-ssrf-server-side-request.html"
+          href="https://learn.snyk.io/lesson/ssrf-server-side-request-forgery"
           target="_blank"
           rel="noopener noreferrer"
           className="theory__link"
         >
           <IoOpen />
           <div>
-            <span className="theory__link-title">Полный гайд по SSRF</span>
-            <span className="theory__link-desc">Векторы, обходы, эксплуатация — исчерпывающий материал</span>
+            <span className="theory__link-title">Snyk — Что такое SSRF</span>
+            <span className="theory__link-desc">Учебник с примерами на JavaScript, векторы атак и методы защиты</span>
           </div>
         </a>
       </div>
