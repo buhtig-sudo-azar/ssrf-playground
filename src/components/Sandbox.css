@@ -52,20 +52,36 @@
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
 }
 
-/* Scenario Info */
-.sandbox__scenario-info {
+/* Pre-explanation */
+.sandbox__pre-explanation {
   background: var(--sandbox-bg);
-  border: 1px solid var(--sandbox-border);
+  border: 1px solid var(--primary-color);
+  border-left: 4px solid var(--primary-color);
   border-radius: 8px;
-  padding: 14px 16px;
+  padding: 16px;
   margin-bottom: 16px;
 }
 
-.sandbox__scenario-desc {
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin: 0;
+.sandbox__pre-explanation-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--primary-color);
+  margin-bottom: 8px;
+}
+
+.sandbox__pre-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.sandbox__pre-text {
+  color: var(--text-color);
+  line-height: 1.7;
   font-size: 0.93rem;
+  margin: 0;
 }
 
 /* Input Group */
@@ -302,6 +318,112 @@
   margin: 0;
   border-top: 1px solid var(--card-border);
   font-style: italic;
+}
+
+/* Annotation */
+.sandbox__annotation {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--card-border);
+  background: var(--tooltip-bg);
+  color: var(--tooltip-text);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.sandbox__annotation-icon {
+  flex-shrink: 0;
+  font-size: 20px;
+  margin-top: 2px;
+}
+
+.sandbox__annotation strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.sandbox__annotation p {
+  margin: 0;
+}
+
+/* Steps */
+.sandbox__steps {
+  padding: 16px;
+  border-top: 1px solid var(--card-border);
+  background: var(--sandbox-bg);
+}
+
+.sandbox__step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--divider-color);
+}
+
+.sandbox__step:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.sandbox__step:first-child {
+  padding-top: 0;
+}
+
+.sandbox__step-num {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.sandbox__step-text {
+  color: var(--text-color);
+  line-height: 1.65;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Real World */
+.sandbox__realworld {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--card-border);
+  background: rgba(248, 81, 73, 0.06);
+  border-left: 4px solid var(--danger-color);
+}
+
+.sandbox__realworld-icon {
+  flex-shrink: 0;
+  font-size: 20px;
+  color: var(--danger-color);
+  margin-top: 2px;
+}
+
+.sandbox__realworld strong {
+  display: block;
+  color: var(--danger-color);
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.sandbox__realworld p {
+  color: var(--text-secondary);
+  line-height: 1.65;
+  font-size: 0.9rem;
+  margin: 0;
 }
 
 /* Explanation */

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { IoSend, IoRefresh, IoChevronDown, IoChevronUp, IoAlertCircle, IoCheckmarkCircle, IoWarning } from 'react-icons/io5';
+import { IoSend, IoRefresh, IoChevronDown, IoChevronUp, IoAlertCircle, IoCheckmarkCircle, IoWarning, IoBook, IoFlame } from 'react-icons/io5';
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
 import json from 'react-syntax-highlighter/dist/esm/languages/hljs/json';
 import { atomOneDark, atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
@@ -23,6 +23,7 @@ export default function Sandbox() {
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [showSteps, setShowSteps] = useState(false);
   const [showFlow, setShowFlow] = useState(false);
   const [requestStage, setRequestStage] = useState(0);
   const responseRef = useRef(null);
@@ -40,6 +41,7 @@ export default function Sandbox() {
     }
     setResponse(null);
     setShowExplanation(false);
+    setShowSteps(false);
     setShowFlow(false);
     setRequestStage(0);
   }, []);
@@ -56,6 +58,7 @@ export default function Sandbox() {
     setLoading(true);
     setResponse(null);
     setShowExplanation(false);
+    setShowSteps(false);
     setShowFlow(true);
     setRequestStage(1);
 
@@ -91,6 +94,7 @@ export default function Sandbox() {
     setResponse(null);
     setLoading(false);
     setShowExplanation(false);
+    setShowSteps(false);
     setShowFlow(false);
     setRequestStage(0);
   }, []);
@@ -112,8 +116,10 @@ export default function Sandbox() {
     <section className="sandbox" id="sandbox">
       <h2 className="sandbox__heading">Интерактивная песочница</h2>
       <p className="sandbox__intro">
-        Выберите сценарий атаки, нажмите «Отправить запрос» и наблюдайте,
-        как уязвимый сервер обрабатывает ваш запрос.
+        Здесь вы можете <strong>самостоятельно попробовать</strong> каждый вектор SSRF-атаки
+        в безопасной эмулированной среде. Выберите сценарий, прочитайте пояснение перед отправкой,
+        нажмите «Отправить запрос» и изучите результат. Под каждым ответом есть детальный разбор:
+        что произошло, почему это опасно, и реальный пример из жизни.
       </p>
 
       {/* Scenario Selector */}
@@ -135,15 +141,19 @@ export default function Sandbox() {
         </select>
       </div>
 
-      {/* Scenario Description */}
-      <div className="sandbox__scenario-info">
-        <p className="sandbox__scenario-desc">{selectedScenario?.description}</p>
+      {/* Pre-explanation (before sending) */}
+      <div className="sandbox__pre-explanation">
+        <div className="sandbox__pre-explanation-header">
+          <IoBook className="sandbox__pre-icon" />
+          <span>Перед тем как нажать «Отправить» — прочитайте, что произойдёт:</span>
+        </div>
+        <p className="sandbox__pre-text">{selectedScenario?.preExplanation}</p>
       </div>
 
       {/* Input */}
       <div className="sandbox__input-group">
         <label htmlFor="url-input" className="sandbox__label">
-          URL для отправки с сервера:
+          URL, который сервер получит от атакующего:
         </label>
         <div className="sandbox__input-row">
           <input
@@ -168,7 +178,7 @@ export default function Sandbox() {
             ) : (
               <IoSend />
             )}
-            <span>{loading ? 'Отправка...' : 'Отправить запрос'}</span>
+            <span>{loading ? 'Выполняю...' : 'Отправить запрос'}</span>
           </button>
           {response && (
             <button
@@ -206,7 +216,7 @@ export default function Sandbox() {
       {response && (
         <div className="sandbox__response" ref={responseRef}>
           <div className="sandbox__response-header">
-            <h3 className="sandbox__response-title">Ответ сервера</h3>
+            <h3 className="sandbox__response-title">Ответ «сервера» (эмулировано)</h3>
             {severity && (
               <span
                 className="sandbox__severity"
@@ -233,7 +243,7 @@ export default function Sandbox() {
                 customStyle={{
                   borderRadius: 8,
                   padding: 16,
-                  fontSize: '0.88rem',
+                  fontSize: '0.85rem',
                   margin: 0,
                 }}
               >
@@ -246,7 +256,7 @@ export default function Sandbox() {
                 customStyle={{
                   borderRadius: 8,
                   padding: 16,
-                  fontSize: '0.88rem',
+                  fontSize: '0.85rem',
                   margin: 0,
                 }}
               >
@@ -255,8 +265,54 @@ export default function Sandbox() {
             )}
           </div>
 
+          {/* Response Annotation */}
+          {response.responseAnnotation && (
+            <div className="sandbox__annotation">
+              <IoAlertCircle className="sandbox__annotation-icon" />
+              <div>
+                <strong>Разбор ответа:</strong>
+                <p>{response.responseAnnotation}</p>
+              </div>
+            </div>
+          )}
+
           {!response.found && response.hint && (
             <p className="sandbox__hint">{response.hint}</p>
+          )}
+
+          {/* Step by step toggle */}
+          {response.found && response.stepByStep && (
+            <>
+              <button
+                className="sandbox__explanation-toggle"
+                onClick={() => setShowSteps(!showSteps)}
+                aria-expanded={showSteps}
+              >
+                <span>Пошаговый разбор атаки</span>
+                {showSteps ? <IoChevronUp /> : <IoChevronDown />}
+              </button>
+              {showSteps && (
+                <div className="sandbox__steps">
+                  {response.stepByStep.map((step, idx) => (
+                    <div key={idx} className="sandbox__step">
+                      <span className="sandbox__step-num">{idx + 1}</span>
+                      <p className="sandbox__step-text">{step}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Real world example */}
+          {response.found && response.realWorldExample && (
+            <div className="sandbox__realworld">
+              <IoFlame className="sandbox__realworld-icon" />
+              <div>
+                <strong>Реальный случай:</strong>
+                <p>{response.realWorldExample}</p>
+              </div>
+            </div>
           )}
 
           {/* Explanation toggle */}
@@ -265,19 +321,20 @@ export default function Sandbox() {
             onClick={() => setShowExplanation(!showExplanation)}
             aria-expanded={showExplanation}
           >
-            <span>Показать объяснение</span>
+            <span>Подробное объяснение уязвимости</span>
             {showExplanation ? <IoChevronUp /> : <IoChevronDown />}
           </button>
 
           {showExplanation && (
             <div className="sandbox__explanation">
-              {response.found && selectedScenario?.explanation ? (
-                <p>{selectedScenario.explanation}</p>
+              {response.found && response.explanation ? (
+                <p>{response.explanation}</p>
               ) : (
                 <p>
                   Указанный URL не соответствует ни одному из известных векторов атаки.
                   В реальном сценарии сервер вернул бы ошибку или содержимое запрошенного ресурса.
-                  Попробуйте один из примеров выше, чтобы увидеть, как работает SSRF.
+                  Попробуйте выбрать один из сценариев в выпадающем списке выше, чтобы увидеть
+                  детальный разбор атаки с пояснениями.
                 </p>
               )}
             </div>
